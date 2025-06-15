@@ -1,0 +1,25 @@
+# Core dependencies for RAG and vector database
+llama-index-core
+llama-index-embeddings-openai
+llama-index-llms-openai
+chromadb
+
+# Web framework for API
+fastapi
+fastapi-cli
+uvicorn[standard]
+
+# Telegram bot
+python-telegram-bot
+
+# Additional dependencies that might be needed
+openai
+python-dotenv
+pydantic
+
+# Optional: for better text processing
+nltk
+tiktoken
+
+# For deployment (optional)
+gunicorn
