@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from typing import List, Dict, Any
 from _utils.rag_service import RAGService
+from contextlib import asynccontextmanager
 from _utils.bot import process_telegram_update, TELEGRAM_BOT_TOKEN
 
 # Load environment variables
@@ -20,12 +21,16 @@ app = FastAPI(
 rag_service = RAGService()
 
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """Initialize the RAG service on startup"""
     success = rag_service.load_index()
     if not success:
         raise RuntimeError("Failed to load RAG index")
+    yield
+    # Aquí puedes agregar código de limpieza si lo necesitas
+
+app = FastAPI(lifespan=lifespan)
 
 # Request/Response models
 
@@ -62,16 +67,17 @@ async def telegram_webhook(request: Request):
     try:
         # Get the raw JSON from the request
         update_data = await request.json()
-        
+
         # Validate that we have a bot token
         if not TELEGRAM_BOT_TOKEN:
-            raise HTTPException(status_code=500, detail="Telegram bot token not configured")
-        
+            raise HTTPException(
+                status_code=500, detail="Telegram bot token not configured")
+
         # Process the update using the bot's process function
         await process_telegram_update(update_data, TELEGRAM_BOT_TOKEN)
-        
+
         return {"status": "ok"}
-    
+
     except Exception as e:
         print(f"❌ Error processing Telegram webhook: {e}")
         raise HTTPException(status_code=500, detail="Error processing webhook")

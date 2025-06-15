@@ -38,12 +38,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         
         answer = result.get("answer", "Lo siento, no pude encontrar una respuesta para eso.")
         sources = result.get("sources", [])
-
-        response_message = f"{answer}"
-        if sources:
-            response_message += "\n\nSources:\n" + "\n".join(f"- {source}" for source in sources)
-        
-        await update.message.reply_text(response_message)
+        print(f"🤔 Pregunta: {user_question}")
+        print(f"🤖 Respuesta generada: {answer}")
+        print(f"📚 Fuentes utilizadas: {sources}")
+        await update.message.reply_text(answer)
 
     except Exception as e:
         print(f"❌ Error processing Telegram message: {e}")
